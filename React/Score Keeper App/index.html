@@ -1,0 +1,126 @@
+<html>
+
+<head>
+    <title> Score Keeper</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root" style="text-align: center;"></div>
+    <script type="text/babel">
+        let score = 0;
+        let wicket = 0;
+        let ballWiseRes = [];
+        let hit = 0;
+        let inputRef = React.createRef();
+
+        function addScore(num) {
+            hit = num;
+            rootElement.render(<App />);
+            // if (wicket < 10) {
+            //     ballWiseRes.push(num);
+            //     score += num;
+            //     rootElement.render(<App />)
+            //     console.log(ballWiseRes);
+            // } // to simply change the score on the score board without form
+        }
+        function addWicket() {
+            hit = "W";
+            rootElement.render(<App />);
+
+            // if (wicket < 10) {
+            //     ballWiseRes.push("W");
+            //     wicket += 1;
+            //     rootElement.render(<App />);
+            //     console.log(ballWiseRes);
+            // }
+
+        }
+        // in jsx don't call the function like onClick= {clickOne()} just use onClick={clickOne}
+        //just pass the refrence of the function for event handling
+        //if we just normally pass the argument in the function in App like 
+        // <button onClick = {addScore(3)}>3</button> we will be stuck in an infinite loop
+        // as the App component will be rerendered again and again
+        //instead of calling a function inside an event pass the refrence and for argument make the function inline as shown below
+        const ScoreButtons = () => (
+            <div>
+                <button onClick={() => addScore(0)}>0</button>
+                <button onClick={() => addScore(1)}>1</button>
+                <button onClick={() => addScore(2)}>2</button>
+                <button onClick={() => addScore(3)}>3</button>
+                <button onClick={() => addScore(4)}>4</button>
+                <button onClick={() => addScore(5)}>5</button>
+                <button onClick={() => addScore(6)}>6</button>
+                <button onClick={addWicket}>wicket</button>
+            </div>
+
+        )
+
+        const Result = () => (
+            <div>
+                {ballWiseRes.map((res, index) => (
+                    <>
+                        {index % 6 == 0 ? <br /> : null}
+                        <span key={index}>{res == 0 ? <strong>.</strong> : res}</span>&nbsp;&nbsp;&nbsp;</>))}
+            </div>
+        )
+
+        function handleSubmit(event) {
+            event.preventDefault();
+
+            if (hit == "W") {
+                wicket += 1;
+            } else {
+                score += hit;
+            }
+            ballWiseRes.unshift(
+                // one way 
+                //  <span>{hit}{", "}{inputRef.current.value}</span>
+                // other way template literals 
+                <span>{`${hit}, ${inputRef.current.value}`}</span>
+            );
+            hit = 0;
+            inputRef.current.value = " ";
+            // push inserts at the end of array but unshift will do it in the starting of array
+            rootElement.render(<App />);
+
+        }
+        // synthetic events to prevent the default behaviour like reloading of page
+        //it is a wrapper around the DOM element
+        const Form = () => (
+            <form onSubmit={handleSubmit}>
+                <input value={hit} />
+                <input ref={inputRef} placeholder="Add a comment" />
+                <button>Submit</button>
+            </form>
+
+        )
+        // Refrence - create ref  // uncontrolled component
+        // provide us the way to access the data  from (node of the DOM) our component directly using this.refname
+
+        const App = () => (
+            <>
+                <h1>SCORE KEEPER</h1>
+                <h2>SCORE : {score}/{wicket}</h2>
+                <ScoreButtons />
+                <br />
+                <Form />
+                <hr />
+
+                {ballWiseRes.map((res, index) => (
+                    <p key={index}>{res} </p>
+                ))}
+
+            </>
+        )
+        const rootElement = ReactDOM.createRoot(document.getElementById("root"));
+        rootElement.render(<App />);
+
+        //virtual dom is helping render the app fast as it is rendering the required components instead of repainting the page
+
+    </script>
+</body>
+
+</html>
